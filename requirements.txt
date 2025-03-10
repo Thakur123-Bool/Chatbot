@@ -1,5 +1,7 @@
-gradio==3.8.0
-ollama==1.0.0  # Adjust the version number if needed
-langchain==0.0.1  # Update as per your version
-langchain-community==0.0.1  # Update accordingly
-chromadb==0.1.0  # Chroma version, update as needed
+gradio
+ollama  # Adjust the version number if needed
+langchain  # Update as per your version
+langchain-community  # Update accordingly
+chromadb  # Chroma version, update as needed
+langchain_ollama
+pymupdf
