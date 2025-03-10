@@ -1,7 +1,7 @@
 import ollama
 import os
 import re
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -30,7 +30,7 @@ def process_pdf(pdf_files: List[UploadFile]):
         chunks = text_splitter.split_documents(data)
         all_chunks.extend(chunks)
 
-    embeddings = OllamaEmbeddings(model="deepseek-r1:1.5b")
+    embeddings = OllamaEmbeddings(model="nomic-embed-text")
     vectorstore = Chroma.from_documents(documents=all_chunks, embedding=embeddings, persist_directory="./chroma_db")
     retriever = vectorstore.as_retriever()
 
@@ -56,14 +56,19 @@ def rag_chain(question, text_splitter, vectorstore, retriever):
 
 @app.post("/ask_question/")
 async def ask_question(pdf_files: List[UploadFile] = File(...), question: str = ""):
-    # Process the uploaded PDFs and question
-    text_splitter, vectorstore, retriever = process_pdf(pdf_files)
-    if text_splitter is None:
-        return JSONResponse(content={"message": "No PDF uploaded or PDFs are empty."}, status_code=400)
-    
-    result = rag_chain(question, text_splitter, vectorstore, retriever)
-    return JSONResponse(content={"answer": result})
+    try:
+        # Process the uploaded PDFs and question
+        text_splitter, vectorstore, retriever = process_pdf(pdf_files)
+        if text_splitter is None:
+            raise HTTPException(status_code=400, detail="No PDF uploaded or PDFs are empty.")
+        
+        result = rag_chain(question, text_splitter, vectorstore, retriever)
+        return JSONResponse(content={"answer": result})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+# To run the FastAPI app, use the following command:
+# uvicorn your_script_name:app --reload
 
 # import ollama  # Enables interaction with local large language models (LLMs)
 # import gradio as gr  # Provides an easy-to-use web interface for the chatbot
