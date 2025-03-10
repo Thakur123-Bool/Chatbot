@@ -1,0 +1,9 @@
+Flask
+uvicorn
+ollama  # Adjust the version number if needed
+langchain  # Update as per your version
+langchain-community  # Update accordingly
+chromadb  # Chroma version, update as needed
+langchain_ollama
+pymupdf
+werkzeug
