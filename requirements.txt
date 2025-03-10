@@ -1,3 +1,5 @@
+fastapi
+uvicorn
 gradio
 ollama  # Adjust the version number if needed
 langchain  # Update as per your version
